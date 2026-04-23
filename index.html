@@ -2,510 +2,418 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Brawl Stars | Мобильное управление</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>ГлогусСтарс - 3D Глобус со Звёздами</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-
         body {
-            width: 100vw;
-            height: 100vh;
+            margin: 0;
             overflow: hidden;
-            font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, 'Roboto', sans-serif;
-            touch-action: none;
+            font-family: 'Segoe UI', 'Arial', sans-serif;
         }
-
-        .fullscreen-menu {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #1C3E9B;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 10;
-        }
-
-        .menu-card {
-            max-width: 500px;
-            width: 90%;
-            background: #2A4EB8;
-            border-radius: 40px;
-            padding: 40px 30px 50px;
-            text-align: center;
-            box-shadow: 0 10px 0 #0F2A5E;
-        }
-
-        .resources {
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-            margin-bottom: 20px;
-            background: #1C3E9B;
-            padding: 10px 20px;
-            border-radius: 60px;
-            width: fit-content;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .resource-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: #0F2A5E;
-            padding: 6px 18px;
-            border-radius: 40px;
-            font-weight: bold;
-            font-size: 20px;
-        }
-
-        .coins-text { color: #FFD700; }
-        .gems-text { color: #00BFFF; }
-
-        .game-title h1 {
-            font-size: 48px;
-            font-weight: 800;
-            color: #FFE484;
-            text-shadow: 4px 4px 0 #C87A1A;
-        }
-
-        .action-buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            margin-top: 40px;
-        }
-
-        .btn {
-            width: 100%;
-            padding: 18px 8px;
-            border: none;
-            border-radius: 60px;
-            font-weight: 800;
-            font-size: 28px;
-            cursor: pointer;
-        }
-
-        .btn-brawlers { background: #F5A623; color: #3D2B1A; box-shadow: 0 7px 0 #B4620C; }
-        .btn-play { background: #3BC06F; color: white; box-shadow: 0 7px 0 #1D6B3A; }
-        .btn-shop { background: #5B4B8C; color: white; box-shadow: 0 7px 0 #3A2A5E; }
-        .btn:active { transform: scale(0.97); }
-
-        .shop-screen, .brawlers-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #1C3E9B;
-            display: none;
-            flex-direction: column;
-            z-index: 15;
-            padding: 20px;
-            overflow-y: auto;
-        }
-
-        .shop-header, .brawlers-header {
-            background: #2A4EB8;
-            padding: 15px 20px;
-            border-radius: 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-        }
-
-        .shop-grid, .brawlers-grid {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 25px;
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-
-        .shop-item, .brawler-card {
-            background: #2A4EB8;
-            border-radius: 30px;
-            padding: 20px;
-            text-align: center;
-            width: 250px;
-            border: 3px solid #FFE484;
-            cursor: pointer;
-        }
-
-        .brawler-card {
-            width: 180px;
-        }
-
-        .brawler-card.selected {
-            background: #F5A623;
-            border-color: white;
-            box-shadow: 0 0 20px gold;
-        }
-
-        .brawler-avatar {
-            width: 100px;
-            height: 100px;
-            background: #F4C542;
-            border-radius: 50%;
-            margin: 0 auto 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 60px;
-        }
-
-        .brawler-name { font-size: 24px; font-weight: bold; color: #FFE484; }
-        .brawler-rarity { font-size: 12px; margin: 5px 0; }
-        .brawler-desc { font-size: 11px; color: white; }
-
-        .shop-item-title { font-size: 24px; font-weight: bold; color: #FFE484; margin-bottom: 10px; }
-        .shop-item-price { font-size: 20px; font-weight: bold; margin: 10px 0; }
-        .shop-btn { background: #3BC06F; border: none; padding: 10px 20px; border-radius: 30px; color: white; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        .shop-btn:active { transform: scale(0.95); }
-        .skin-equipped { background: #FFD700; color: #1C3E9B; padding: 5px; border-radius: 20px; font-size: 12px; margin-top: 10px; }
-        .skin-unequip-btn { background: #ff5722; border: none; padding: 10px 20px; border-radius: 30px; color: white; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        .skin-unequip-btn:active { transform: scale(0.95); }
-
-        .game-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #2a6b2f;
-            display: none;
-            flex-direction: column;
-            z-index: 20;
-        }
-
-        .game-header {
-            background: #1e2a3a;
-            padding: 12px 20px;
-            display: flex;
-            justify-content: space-between;
-            color: white;
-            font-weight: bold;
-            z-index: 30;
-        }
-
-        .back-btn { background: #ff5722; border: none; padding: 8px 20px; border-radius: 30px; color: white; cursor: pointer; }
-        .stats { display: flex; gap: 20px; }
-        .stat { background: black; padding: 5px 15px; border-radius: 30px; }
-
-        canvas {
+        #info {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: block;
-            z-index: 1;
-        }
-
-        /* Мобильные элементы управления */
-        .mobile-controls {
-            position: absolute;
-            bottom: 20px;
-            left: 0;
-            right: 0;
-            display: none;
-            justify-content: space-between;
-            padding: 0 20px;
-            z-index: 40;
-            pointer-events: none;
-        }
-
-        .joystick-container {
-            pointer-events: auto;
-            width: 140px;
-            height: 140px;
-            background: rgba(0,0,0,0.4);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            backdrop-filter: blur(4px);
-        }
-
-        .joystick-base {
-            width: 120px;
-            height: 120px;
-            background: rgba(30,30,50,0.7);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 2px solid rgba(255,255,255,0.3);
-        }
-
-        .joystick-thumb {
-            width: 50px;
-            height: 50px;
-            background: rgba(255,255,255,0.9);
-            border-radius: 50%;
-            transition: transform 0.02s linear;
-            box-shadow: 0 0 10px rgba(0,0,0,0.3);
-        }
-
-        .attack-btn {
-            pointer-events: auto;
-            width: 80px;
-            height: 80px;
-            background: rgba(255,68,68,0.9);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 40px;
-            font-weight: bold;
-            color: white;
-            box-shadow: 0 0 15px rgba(0,0,0,0.3);
-            border: 3px solid #FFD700;
-            cursor: pointer;
-            user-select: none;
-            touch-action: manipulation;
-        }
-
-        .attack-btn:active {
-            transform: scale(0.95);
-            background: rgba(255,34,34,0.9);
-        }
-
-        .controls-info {
-            position: absolute;
-            bottom: 15px;
-            left: 0;
-            right: 0;
-            text-align: center;
+            top: 20px;
+            left: 20px;
             color: white;
             background: rgba(0,0,0,0.6);
-            padding: 6px;
+            padding: 10px 18px;
+            border-radius: 8px;
+            backdrop-filter: blur(5px);
+            pointer-events: none;
+            z-index: 10;
             font-size: 14px;
+            letter-spacing: 1px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.3);
+            border-left: 3px solid #ffaa44;
+        }
+        #controls-hint {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            color: rgba(255,255,255,0.6);
+            background: rgba(0,0,0,0.4);
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 12px;
             pointer-events: none;
-            z-index: 35;
+            font-family: monospace;
         }
-
-        .loot-notification {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0,0,0,0.9);
-            color: gold;
-            padding: 20px 40px;
-            border-radius: 30px;
-            font-size: 24px;
-            font-weight: bold;
-            z-index: 100;
-            animation: fadeOut 2s forwards;
-            pointer-events: none;
-            text-align: center;
-            white-space: nowrap;
-        }
-
-        @keyframes fadeOut {
-            0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-            100% { opacity: 0; transform: translate(-50%, -50%) scale(1.5); }
-        }
-
-        @media (max-width: 768px) {
-            .mobile-controls { display: flex; }
-            .controls-info { display: none; }
-            .joystick-container { width: 120px; height: 120px; }
-            .joystick-base { width: 100px; height: 100px; }
-            .joystick-thumb { width: 45px; height: 45px; }
-            .attack-btn { width: 70px; height: 70px; font-size: 35px; }
+        @media (max-width: 600px) {
+            #info { font-size: 10px; top: 10px; left: 10px; }
+            #controls-hint { font-size: 8px; }
         }
     </style>
 </head>
 <body>
-
-<div id="menuScreen" class="fullscreen-menu">
-    <div class="menu-card">
-        <div class="resources">
-            <div class="resource-item"><span>💰</span><span class="coins-text" id="coinsDisplay">0</span></div>
-            <div class="resource-item"><span>💎</span><span class="gems-text" id="gemsDisplay">0</span></div>
-        </div>
-        <div class="game-title"><h1>BRAWL STARS</h1><p>выбери режим</p></div>
-        <div class="action-buttons">
-            <button class="btn btn-brawlers" id="brawlersBtn">🤜 БРАВЛЕРЫ 🤛</button>
-            <button class="btn btn-play" id="playBtn">🎮 ИГРАТЬ 🎮</button>
-            <button class="btn btn-shop" id="shopBtn">🛒 МАГАЗИН 🛒</button>
-        </div>
-        <div class="footer-note">⭐ На мобильных устройствах — джойстик и кнопка атаки</div>
+    <div id="info">
+        ✨ ГЛОГУССТАРС ✨ | Вращающийся глобус | Звёздное сияние
     </div>
-</div>
-
-<div id="shopScreen" class="shop-screen">
-    <div class="shop-header">
-        <button class="back-btn-small" id="backFromShopBtn" style="background:#ff5722;border:none;padding:8px20px;border-radius:30px;color:white;">◀ НАЗАД</button>
-        <h2 style="color:#FFE484">🛒 МАГАЗИН</h2>
-        <div style="width:80px"></div>
+    <div id="controls-hint">
+        🖱️ Мышь: вращать камеру | 📜 Скролл: приблизить
     </div>
-    <div class="shop-grid" id="shopGrid"></div>
-</div>
 
-<div id="brawlersScreen" class="brawlers-screen">
-    <div class="brawlers-header">
-        <button class="back-btn-small" id="backFromBrawlersBtn" style="background:#ff5722;border:none;padding:8px20px;border-radius:30px;color:white;">◀ НАЗАД</button>
-        <h2 style="color:#FFE484">🤠 ТВОИ БРАВЛЕРЫ</h2>
-        <div style="width:80px"></div>
-    </div>
-    <div class="brawlers-grid" id="brawlersGrid"></div>
-</div>
-
-<div id="gameScreen" class="game-screen">
-    <div class="game-header">
-        <button class="back-btn" id="backToMenuBtn">◀ МЕНЮ</button>
-        <span id="brawlerNameDisplay">🤠 Bart</span>
-        <div class="stats"><div class="stat">❤️ <span id="healthDisplay">100</span></div><div class="stat">💀 <span id="enemiesLeft">20</span></div></div>
-    </div>
-    <canvas id="gameCanvas"></canvas>
-    
-    <!-- Мобильные элементы управления -->
-    <div class="mobile-controls" id="mobileControls">
-        <div class="joystick-container" id="joystickContainer">
-            <div class="joystick-base" id="joystickBase">
-                <div class="joystick-thumb" id="joystickThumb"></div>
-            </div>
-        </div>
-        <div class="attack-btn" id="mobileAttackBtn">🔫</div>
-    </div>
-    
-    <div class="controls-info">🎮 WASD / стрелки — движение | 🔫 КЛИК — атака</div>
-</div>
-
-<script>
-    // ==================== БРАВЛЕРЫ С УНИКАЛЬНЫМИ ТЕЛАМИ ====================
-    const BRAWLERS_DATA = {
-        bart: { 
-            name: "BART", rarity: "⭐ Обычный", attackType: "projectile", damage: 15, 
-            bodyColor: "#F4C542", desc: "стреляет скрепками",
-            drawBody: (ctx, x, y, radius) => {
-                ctx.fillStyle = "#F4C542";
-                ctx.beginPath(); ctx.arc(x, y, radius, 0, Math.PI*2); ctx.fill();
-                ctx.fillStyle = "#8B5A2B";
-                ctx.fillRect(x - radius+5, y - radius+5, radius*0.6, radius*0.3);
-                ctx.fillStyle = "#2F1E0E";
-                ctx.beginPath(); ctx.arc(x - radius*0.4, y - radius*0.2, 4, 0, Math.PI*2); ctx.fill();
-                ctx.beginPath(); ctx.arc(x + radius*0.4, y - radius*0.2, 4, 0, Math.PI*2); ctx.fill();
-                ctx.fillStyle = "#8B5A2B";
-                ctx.fillRect(x - radius*0.7, y - radius*0.9, radius*1.4, radius*0.3);
-                ctx.fillStyle = "#5C3A1A";
-                ctx.beginPath(); ctx.moveTo(x - radius*0.5, y + radius*0.1); ctx.quadraticCurveTo(x, y + radius*0.3, x + radius*0.5, y + radius*0.1); ctx.fill();
-            }
-        },
-        griz: { 
-            name: "ГРИЗ", rarity: "🟢 Редкий", attackType: "poison", damage: 23, 
-            bodyColor: "#6B8E23", desc: "отравляющая пуля",
-            drawBody: (ctx, x, y, radius) => {
-                ctx.fillStyle = "#6B8E23";
-                ctx.beginPath(); ctx.arc(x, y, radius, 0, Math.PI*2); ctx.fill();
-                ctx.fillStyle = "#556B2F";
-                ctx.beginPath(); ctx.arc(x - radius*0.5, y - radius*0.5, radius*0.3, 0, Math.PI*2); ctx.fill();
-                ctx.beginPath(); ctx.arc(x + radius*0.5, y - radius*0.5, radius*0.3, 0, Math.PI*2); ctx.fill();
-                ctx.fillStyle = "#3E5A1A";
-                ctx.beginPath(); ctx.ellipse(x - radius*0.35, y - radius*0.1, 4, 5, 0, 0, Math.PI*2); ctx.fill();
-                ctx.beginPath(); ctx.ellipse(x + radius*0.35, y - radius*0.1, 4, 5, 0, 0, Math.PI*2); ctx.fill();
-                ctx.fillStyle = "#2F1E0E";
-                ctx.beginPath(); ctx.arc(x - radius*0.4, y - radius*0.15, 3, 0, Math.PI*2); ctx.fill();
-                ctx.beginPath(); ctx.arc(x + radius*0.4, y - radius*0.15, 3, 0, Math.PI*2); ctx.fill();
-                ctx.fillStyle = "#3E5A1A";
-                ctx.beginPath(); ctx.ellipse(x, y + radius*0.1, radius*0.25, radius*0.15, 0, 0, Math.PI*2); ctx.fill();
-            }
-        },
-        magnus: { 
-            name: "MAGNUS", rarity: "🟢 Редкий", attackType: "fireball", damage: 23, 
-            bodyColor: "#E25822", desc: "огненные шары",
-            drawBody: (ctx, x, y, radius) => {
-                ctx.fillStyle = "#E25822";
-                ctx.beginPath(); ctx.arc(x, y, radius, 0, Math.PI*2); ctx.fill();
-                ctx.fillStyle = "#B84010";
-                ctx.beginPath(); ctx.moveTo(x - radius, y - radius*0.5); ctx.lineTo(x, y - radius*1.2); ctx.lineTo(x + radius, y - radius*0.5); ctx.fill();
-                ctx.fillStyle = "#8B0000";
-                ctx.beginPath(); ctx.ellipse(x, y + radius*0.2, radius*0.5, radius*0.3, 0, 0, Math.PI*2); ctx.fill();
-                ctx.fillStyle = "#FFD700";
-                ctx.beginPath(); ctx.arc(x - radius*0.35, y - radius*0.1, 4, 0, Math.PI*2); ctx.fill();
-                ctx.beginPath(); ctx.arc(x + radius*0.35, y - radius*0.1, 4, 0, Math.PI*2); ctx.fill();
-                ctx.fillStyle = "#FF6600";
-                for(let i = -2; i <= 2; i++) {
-                    ctx.beginPath(); ctx.moveTo(x + i*6, y - radius+5); ctx.lineTo(x + i*6, y - radius-8); ctx.lineTo(x + i*6 + 3, y - radius-3); ctx.fill();
-                }
-            }
-        },
-        shadow: { 
-            name: "ТЕНЬ", rarity: "🟣 Эпический", attackType: "melee", damage: 6, 
-            bodyColor: "#4A4A6A", desc: "бьёт кулаками",
-            drawBody: (ctx, x, y, radius) => {
-                ctx.fillStyle = "#4A4A6A";
-                ctx.beginPath(); ctx.arc(x, y, radius, 0, Math.PI*2); ctx.fill();
-                ctx.fillStyle = "#2A2A4A";
-                ctx.beginPath(); ctx.rect(x - radius*0.7, y - radius*0.5, radius*1.4, radius*0.8); ctx.fill();
-                ctx.fillStyle = "#FF4444";
-                ctx.beginPath(); ctx.moveTo(x, y - radius*0.7); ctx.lineTo(x - 5, y - radius*0.3); ctx.lineTo(x + 5, y - radius*0.3); ctx.fill();
-                ctx.fillStyle = "#FFFFFF";
-                ctx.beginPath(); ctx.arc(x - radius*0.3, y - radius*0.1, 3, 0, Math.PI*2); ctx.fill();
-                ctx.beginPath(); ctx.arc(x + radius*0.3, y - radius*0.1, 3, 0, Math.PI*2); ctx.fill();
-                ctx.fillStyle = "#C0C0C0";
-                ctx.beginPath(); ctx.moveTo(x + radius*0.6, y); ctx.lineTo(x + radius*0.9, y - 5); ctx.lineTo(x + radius*0.9, y + 5); ctx.fill();
-            }
-        },
-        vector: { 
-            name: "ВЕКТОР", rarity: "🟣 Эпический", attackType: "explosion", damage: 10, 
-            bodyColor: "#8A2BE2", desc: "взрыв вокруг",
-            drawBody: (ctx, x, y, radius) => {
-                ctx.fillStyle = "#8A2BE2";
-                ctx.beginPath(); ctx.arc(x, y, radius, 0, Math.PI*2); ctx.fill();
-                ctx.fillStyle = "#6A1BA2";
-                ctx.beginPath(); ctx.rect(x - radius*0.5, y - radius*0.3, radius, radius*0.6); ctx.fill();
-                ctx.fillStyle = "#00FFFF";
-                ctx.beginPath(); ctx.arc(x - radius*0.3, y - radius*0.1, 3, 0, Math.PI*2); ctx.fill();
-                ctx.beginPath(); ctx.arc(x + radius*0.3, y - radius*0.1, 3, 0, Math.PI*2); ctx.fill();
-                ctx.fillStyle = "#FFD700";
-                ctx.beginPath(); ctx.moveTo(x, y - radius); ctx.lineTo(x - 3, y - radius*0.8); ctx.lineTo(x + 3, y - radius*0.8); ctx.fill();
-                for(let i = 0; i < 4; i++) {
-                    let angle = i * Math.PI*2/4;
-                    let x2 = x + Math.cos(angle) * radius*0.8;
-                    let y2 = y + Math.sin(angle) * radius*0.8;
-                    ctx.fillStyle = "#FFD700";
-                    ctx.beginPath(); ctx.arc(x2, y2, 3, 0, Math.PI*2); ctx.fill();
-                }
-            }
-        },
-        paster: { 
-            name: "ПАСТЕР", rarity: "🟣 Эпический", attackType: "dot", damage: 3, 
-            bodyColor: "#C0C0C0", desc: "луч на 10 сек",
-            drawBody: (ctx, x, y, radius) => {
-                ctx.fillStyle = "#C0C0C0";
-                ctx.beginPath(); ctx.arc(x, y, radius, 0, Math.PI*2); ctx.fill();
-                ctx.fillStyle = "#E0E0E0";
-                ctx.beginPath(); ctx.ellipse(x, y - radius*0.3, radius*0.5, radius*0.3, 0, 0, Math.PI*2); ctx.fill();
-                ctx.fillStyle = "#808080";
-                ctx.beginPath(); ctx.arc(x - radius*0.35, y - radius*0.1, 4, 0, Math.PI*2); ctx.fill();
-                ctx.beginPath(); ctx.arc(x + radius*0.35, y - radius*0.1, 4, 0, Math.PI*2); ctx.fill();
-                ctx.fillStyle = "#FFFFFF";
-                ctx.beginPath(); ctx.ellipse(x, y + radius*0.15, radius*0.4, radius*0.2, 0, 0, Math.PI*2); ctx.fill();
-                ctx.fillStyle = "#AAAAAA";
-                for(let i = 0; i < 3; i++) {
-                    ctx.beginPath(); ctx.moveTo(x - 8 + i*8, y + radius*0.3); ctx.lineTo(x - 5 + i*8, y + radius*0.5); ctx.lineTo(x - 11 + i*8, y + radius*0.5); ctx.fill();
-                }
+    <!-- Подключаем Three.js и вспомогательные расширения через CDN -->
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.128.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.128.0/examples/jsm/"
             }
         }
-    };
+    </script>
 
-    // Скины
-    let ownedSkins = [];
-    let equippedSkin = null;
-    const SKINS = { cowboy_bart: { name: "Cowboy Bart", brawler: "bart", price: 57, priceType: "gems", bodyColor: "#DAA5
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+        import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+        import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+        
+        // --- Инициализация сцены, камеры, рендерера ---
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x030318); // глубокий космический синий
+        scene.fog = new THREE.FogExp2(0x030318, 0.0008); // легкая дымка для глубины
+
+        // Камера: перспектива, угол обзора, соотношение, ближняя/дальняя плоскости
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 0, 3.5);
+        camera.lookAt(0, 0, 0);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.toneMapping = THREE.ReinhardToneMapping;
+        renderer.toneMappingExposure = 1.2;
+        document.body.appendChild(renderer.domElement);
+
+        // --- Эффекты постобработки (свечение для звёзд и глобуса) ---
+        const renderScene = new RenderPass(scene, camera);
+        const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.2, 0.3, 0.85);
+        bloomPass.threshold = 0.1;  // яркость порога
+        bloomPass.strength = 0.6;
+        bloomPass.radius = 0.5;
+        
+        const effectComposer = new EffectComposer(renderer);
+        effectComposer.addPass(renderScene);
+        effectComposer.addPass(bloomPass);
+        
+        // --- Орбит контрол для интерактива (можно вращать и приближать) ---
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;          // плавное затухание
+        controls.dampingFactor = 0.05;
+        controls.rotateSpeed = 1.0;
+        controls.zoomSpeed = 1.2;
+        controls.enableZoom = true;
+        controls.zoomSpeed = 1.0;
+        controls.enablePan = false;
+        controls.autoRotate = false;            // отключаем автовращение контролов, вращать будем сам глобус
+        controls.target.set(0, 0, 0);
+        
+        // --- СОЗДАНИЕ ГЛОБУСА (Земля с текстурой высокого качества) ---
+        // Используем качественную текстуру Земли от Three.js примеров (диффузная + спекуляр + нормаль для рельефа)
+        // Загружаем текстуры с CDN, чтобы глобус выглядел реалистично
+        
+        const textureLoader = new THREE.TextureLoader();
+        
+        // Карта цветов Земли (дневная)
+        const earthMap = textureLoader.load('https://threejs.org/examples/textures/planets/earth_atmos_2048.jpg');
+        // Карта облаков (полупрозрачная для эффекта)
+        const earthCloudMap = textureLoader.load('https://threejs.org/examples/textures/planets/earth_clouds_1024.png');
+        // Карта рельефа (нормалей)
+        const earthNormalMap = textureLoader.load('https://threejs.org/examples/textures/planets/earth_normal_2048.jpg');
+        // Спекулярная карта (блики воды)
+        const earthSpecularMap = textureLoader.load('https://threejs.org/examples/textures/planets/earth_specular_2048.jpg');
+        
+        // Основная сфера глобуса
+        const earthGeometry = new THREE.SphereGeometry(1.0, 128, 128);
+        const earthMaterial = new THREE.MeshPhongMaterial({
+            map: earthMap,
+            normalMap: earthNormalMap,
+            specularMap: earthSpecularMap,
+            specular: new THREE.Color('grey'),
+            shininess: 5,
+            emissive: new THREE.Color(0x000022), // легкое свечение с темной стороны
+            emissiveIntensity: 0.15
+        });
+        
+        const earth = new THREE.Mesh(earthGeometry, earthMaterial);
+        scene.add(earth);
+        
+        // Слой облаков (прозрачная сфера чуть большего радиуса)
+        const cloudGeometry = new THREE.SphereGeometry(1.01, 128, 128);
+        const cloudMaterial = new THREE.MeshPhongMaterial({
+            map: earthCloudMap,
+            transparent: true,
+            opacity: 0.15,
+            blending: THREE.AdditiveBlending
+        });
+        const clouds = new THREE.Mesh(cloudGeometry, cloudMaterial);
+        scene.add(clouds);
+        
+        // Добавим атмосферное свечение (внешняя оболочка с эффектом)
+        const atmosphereGeometry = new THREE.SphereGeometry(1.04, 64, 64);
+        const atmosphereMaterial = new THREE.MeshPhongMaterial({
+            color: 0x88aaff,
+            transparent: true,
+            opacity: 0.12,
+            side: THREE.BackSide
+        });
+        const atmosphere = new THREE.Mesh(atmosphereGeometry, atmosphereMaterial);
+        scene.add(atmosphere);
+        
+        // --- ЗВЁЗДНОЕ ПОЛЕ (динамические мерцающие частицы) ---
+        // Создаём большое количество частиц, разбросанных в пространстве
+        
+        const starCount = 3000;
+        const starGeometry = new THREE.BufferGeometry();
+        const starPositions = new Float32Array(starCount * 3);
+        const starColors = new Float32Array(starCount * 3);
+        
+        // Разброс звёзд в сфере радиусом 150-250, но с разной удалённостью для глубины
+        for (let i = 0; i < starCount; i++) {
+            // Используем сферические координаты с случайным радиусом
+            const radius = 80 + Math.random() * 120; // от 80 до 200
+            const theta = Math.random() * Math.PI * 2;
+            const phi = Math.acos(2 * Math.random() - 1);
+            
+            const x = radius * Math.sin(phi) * Math.cos(theta);
+            const y = radius * Math.sin(phi) * Math.sin(theta);
+            const z = radius * Math.cos(phi);
+            
+            starPositions[i*3] = x;
+            starPositions[i*3+1] = y;
+            starPositions[i*3+2] = z;
+            
+            // Цвет звёзд: от холодного белого до слегка голубоватого/желтоватого
+            const colorVal = 0.6 + Math.random() * 0.5;
+            const r = colorVal * (Math.random() > 0.7 ? 0.9 : 1.0);
+            const g = colorVal * (Math.random() > 0.6 ? 0.95 : 1.0);
+            const b = colorVal * (0.8 + Math.random() * 0.4);
+            
+            starColors[i*3] = r;
+            starColors[i*3+1] = g;
+            starColors[i*3+2] = b;
+        }
+        
+        starGeometry.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
+        starGeometry.setAttribute('color', new THREE.BufferAttribute(starColors, 3));
+        
+        // Материал для звёзд (точечные спрайты с круглой формой)
+        // Создаём canvas текстуру для круглого градиентного свечения
+        const createStarTexture = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = 32;
+            canvas.height = 32;
+            const ctx = canvas.getContext('2d');
+            ctx.beginPath();
+            ctx.arc(16, 16, 14, 0, 2 * Math.PI);
+            ctx.fillStyle = 'white';
+            ctx.fill();
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.shadowBlur = 0;
+            const gradient = ctx.createRadialGradient(16, 16, 0, 16, 16, 14);
+            gradient.addColorStop(0, 'rgba(255,255,255,1)');
+            gradient.addColorStop(0.5, 'rgba(255,255,200,0.8)');
+            gradient.addColorStop(0.8, 'rgba(255,200,100,0.3)');
+            gradient.addColorStop(1, 'rgba(255,255,255,0)');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, 32, 32);
+            return new THREE.CanvasTexture(canvas);
+        };
+        
+        const starMaterial = new THREE.PointsMaterial({
+            size: 0.35,
+            map: createStarTexture(),
+            vertexColors: true,
+            transparent: true,
+            opacity: 0.9,
+            blending: THREE.AdditiveBlending
+        });
+        
+        const starField = new THREE.Points(starGeometry, starMaterial);
+        scene.add(starField);
+        
+        // Добавим дополнительный слой очень дальних, тусклых звёзд (мелкие точки)
+        const distantStarCount = 1500;
+        const distantGeo = new THREE.BufferGeometry();
+        const distantPositions = new Float32Array(distantStarCount * 3);
+        for (let i = 0; i < distantStarCount; i++) {
+            // Распределение равномерно по сфере большего радиуса
+            const rad = 180 + Math.random() * 100;
+            const theta2 = Math.random() * Math.PI * 2;
+            const phi2 = Math.acos(2 * Math.random() - 1);
+            distantPositions[i*3] = rad * Math.sin(phi2) * Math.cos(theta2);
+            distantPositions[i*3+1] = rad * Math.sin(phi2) * Math.sin(theta2);
+            distantPositions[i*3+2] = rad * Math.cos(phi2);
+        }
+        distantGeo.setAttribute('position', new THREE.BufferAttribute(distantPositions, 3));
+        const distantStarMat = new THREE.PointsMaterial({
+            color: 0xaaccff,
+            size: 0.12,
+            transparent: true,
+            opacity: 0.5,
+            blending: THREE.AdditiveBlending
+        });
+        const distantStars = new THREE.Points(distantGeo, distantStarMat);
+        scene.add(distantStars);
+        
+        // --- МЕРЦАНИЕ ЗВЁЗД (анимация с использованием времени) ---
+        // Сохраним оригинальные цвета и размеры для анимации
+        // У каждого starPoints можно анимировать opacity или размер, но проще - глобальное мерцание через смену прозрачности?
+        // Сделаем пульсацию для starField и distantStars с разной скоростью
+        // Также добавим эффект "летящих" метеоров? Нет, оставим элегантное мерцание.
+        
+        // Создадим массив для индивидуального мерцания ярких звёзд (выборочно)
+        // Для упрощения сделаем общую анимацию opacity и небольшую ротацию звездного поля для динамики
+        
+        // Дополнительно: добавим несколько крупных "сияющих" звезд (спрайты)
+        const bigStarsCount = 80;
+        const bigStarsGeometry = new THREE.BufferGeometry();
+        const bigStarsPos = [];
+        for (let i = 0; i < bigStarsCount; i++) {
+            const rad = 70 + Math.random() * 130;
+            const theta = Math.random() * Math.PI * 2;
+            const phi = Math.acos(2 * Math.random() - 1);
+            bigStarsPos.push(rad * Math.sin(phi) * Math.cos(theta));
+            bigStarsPos.push(rad * Math.sin(phi) * Math.sin(theta));
+            bigStarsPos.push(rad * Math.cos(phi));
+        }
+        bigStarsGeometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(bigStarsPos), 3));
+        const bigStarMat = new THREE.PointsMaterial({
+            color: 0xffdd99,
+            size: 0.55,
+            transparent: true,
+            blending: THREE.AdditiveBlending
+        });
+        const bigStars = new THREE.Points(bigStarsGeometry, bigStarMat);
+        scene.add(bigStars);
+        
+        // --- ЭФФЕКТ МГНОВЕННЫХ "ПАДАЮЩИХ ЗВЕЗД" (опционально) - добавим пару линий? нет, ограничимся мерцанием.
+        
+        // --- ОСВЕЩЕНИЕ (источники света для реалистичного глобуса) ---
+        // Основной направленный свет (имитация солнца)
+        const sunLight = new THREE.DirectionalLight(0xffffff, 1.2);
+        sunLight.position.set(5, 3, 5);
+        sunLight.castShadow = false; // для производительности
+        scene.add(sunLight);
+        
+        // Дополнительный мягкий свет сзади для подсветки теней
+        const backLight = new THREE.DirectionalLight(0x88aaff, 0.4);
+        backLight.position.set(-3, -1, -4);
+        scene.add(backLight);
+        
+        // Заполняющий свет со всех сторон, чтобы тени не были слишком черными
+        const ambientLight = new THREE.AmbientLight(0x111122, 0.5);
+        scene.add(ambientLight);
+        
+        // Подсветка глобуса с нижней части (красивый эффект)
+        const fillLight = new THREE.PointLight(0x4466cc, 0.3);
+        fillLight.position.set(0, -2, 0);
+        scene.add(fillLight);
+        
+        // Легкая подсветка звездного поля - не нужна, сами светятся
+        
+        // --- ВРАЩЕНИЕ ГЛОБУСА И ОБЛАКОВ ---
+        // Глобус вращается с постоянной скоростью, облака чуть быстрее для эффекта движения
+        
+        let time = 0;
+        
+        // Анимация мерцания звезд: будем менять opacity материалов и размеры частиц
+        // Для пульсации создадим несколько фаз
+        let starPulseSpeed = 0.8;
+        let bigStarPulseSpeed = 1.2;
+        
+        // Сохраним базовые размеры
+        const baseStarSize = starMaterial.size;
+        const baseBigStarSize = bigStarMat.size;
+        const baseDistantOpacity = distantStarMat.opacity;
+        
+        // Дополнительно: добавим случайное смещение для некоторых звезд через шейдер? Упростим анимацию через синус
+        
+        // Также можно добавить вращение всей звездной сферы очень медленное для эффекта движения
+        let starRotationY = 0;
+        
+        // --- АНИМАЦИОННЫЙ ЦИКЛ ---
+        function animate() {
+            requestAnimationFrame(animate);
+            time += 0.012; // плавное увеличение времени
+            
+            // Вращение глобуса и облаков
+            earth.rotation.y += 0.0025;
+            clouds.rotation.y += 0.0032; // облака двигаются чуть быстрее
+            atmosphere.rotation.y += 0.0022;
+            
+            // Динамическое мерцание звезд: изменяем прозрачность и размер в зависимости от времени
+            // Используем синусоидальные волны с разными частотами для разных слоев
+            
+            // Яркие звезды - пульсация
+            const pulse1 = 0.7 + Math.sin(time * 1.8) * 0.2;
+            const pulse2 = 0.6 + Math.sin(time * 2.3) * 0.25;
+            
+            starMaterial.opacity = 0.7 + Math.sin(time * 1.2) * 0.2;
+            starMaterial.size = baseStarSize * (0.85 + Math.sin(time * 1.5) * 0.15);
+            
+            bigStarMat.opacity = 0.8 + Math.sin(time * 1.9) * 0.2;
+            bigStarMat.size = baseBigStarSize * (0.8 + Math.sin(time * 2.1) * 0.2);
+            
+            distantStarMat.opacity = baseDistantOpacity * (0.7 + Math.sin(time * 0.9) * 0.3);
+            
+            // Медленное вращение звездного поля для создания иллюзии движения космоса
+            starField.rotation.y += 0.0003;
+            starField.rotation.x += 0.00015;
+            distantStars.rotation.y -= 0.0002;
+            distantStars.rotation.x += 0.0001;
+            bigStars.rotation.y += 0.00025;
+            bigStars.rotation.z += 0.0001;
+            
+            // Небольшое изменение цвета атмосферы или свечения (для красоты)
+            const hueShift = (Math.sin(time * 0.3) * 0.02);
+            atmosphereMaterial.color.setHSL(0.55 + hueShift, 0.7, 0.6);
+            
+            // Обновление эффекта Bloom (легкая динамика силы свечения)
+            bloomPass.strength = 0.55 + Math.sin(time * 0.7) * 0.08;
+            
+            // Обновление контроля (если используется авто вращение камеры - нет, но мы вращаем объект)
+            controls.update(); // обновляем, чтобы мышь работала плавно
+            
+            // --- ДОПОЛНИТЕЛЬНЫЙ ЭФФЕКТ: летающие частицы "комет" (очень редко, добавим простой sparkle) ---
+            // Вместо сложных частиц, просто добавим мерцающие блики на глобусе - не обязательно
+            
+            // Рендеринг через эффект композер
+            effectComposer.render();
+        }
+        
+        // Запускаем анимацию
+        animate();
+        
+        // --- АДАПТАЦИЯ ПОД ИЗМЕНЕНИЕ РАЗМЕРА ОКНА ---
+        window.addEventListener('resize', onWindowResize, false);
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            effectComposer.setSize(window.innerWidth, window.innerHeight);
+        }
+        
+        // Небольшая задержка для загрузки текстур (показываем сообщение, но оно и так быстро)
+        console.log('ГлогусСтарс запущен! Наслаждайтесь космическим видом 🌍✨');
+        
+        // Добавим небольшую звездную туманность в фоне (опционально, просто для атмосферы)
+        // Создадим несколько случайных дымчатых облаков на заднем плане с помощью дополнительной сферы с текстурой?
+        // Для производительности не будем перегружать.
+        
+        // Но добавим одну большую, очень рассеянную сферу с низкой непрозрачностью (имитация галактики)
+        const galaxyGeometry = new THREE.SphereGeometry(45, 32, 32);
+        const galaxyMaterial = new THREE.MeshBasicMaterial({
+            color: 0x112244,
+            transparent: true,
+            opacity: 0.08,
+            side: THREE.BackSide
+        });
+        const galaxyBackground = new THREE.Mesh(galaxyGeometry, galaxyMaterial);
+        scene.add(galaxyBackground);
+        
+        // Также добавим очень маленькие мерцающие точки на поверхности глобуса? нет, достаточно
+    </script>
+</body>
+</html>
