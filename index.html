@@ -3,417 +3,539 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>ГлогусСтарс - 3D Глобус со Звёздами</title>
+    <title>⚡ МегаКликер | Эпичный кликер с улучшениями</title>
+    <!-- Font Awesome 6 (иконки) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
     <style>
-        body {
+        * {
             margin: 0;
-            overflow: hidden;
-            font-family: 'Segoe UI', 'Arial', sans-serif;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
         }
-        #info {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            color: white;
-            background: rgba(0,0,0,0.6);
-            padding: 10px 18px;
-            border-radius: 8px;
-            backdrop-filter: blur(5px);
-            pointer-events: none;
-            z-index: 10;
-            font-size: 14px;
+
+        body {
+            background: linear-gradient(145deg, #0b1020 0%, #0a0f1a 100%);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* Контейнер игры */
+        .game-container {
+            max-width: 1400px;
+            width: 100%;
+            background: rgba(15, 25, 45, 0.6);
+            backdrop-filter: blur(2px);
+            border-radius: 3rem;
+            padding: 1.5rem;
+            box-shadow: 0 25px 45px rgba(0,0,0,0.4), inset 0 1px 1px rgba(255,255,255,0.1);
+            border: 1px solid rgba(90, 150, 255, 0.2);
+        }
+
+        /* Сетка: главный кликер слева, улучшения справа */
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 1.8rem;
+        }
+
+        /* ЛЕВАЯ ПАНЕЛЬ — КЛИКЕР И СТАТИСТИКА */
+        .clicker-panel {
+            background: rgba(10, 18, 32, 0.7);
+            border-radius: 2rem;
+            padding: 1.8rem;
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(66, 153, 225, 0.3);
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3);
+            transition: all 0.2s;
+        }
+
+        .stats {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .coin-display {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 2rem;
+            padding: 0.8rem 1.5rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.7rem;
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #FFD966;
+            text-shadow: 0 0 6px #ffb347;
+            backdrop-filter: blur(4px);
+            border: 1px solid #ffd96655;
+            margin-bottom: 1.5rem;
+        }
+
+        .coin-display i {
+            font-size: 2rem;
+            color: #FFB347;
+        }
+
+        .stat-grid {
+            display: flex;
+            justify-content: space-between;
+            background: #0a0f1ccc;
+            border-radius: 1.5rem;
+            padding: 1rem;
+            margin-top: 0.5rem;
+            gap: 1rem;
+        }
+
+        .stat-card {
+            text-align: center;
+            flex: 1;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
             letter-spacing: 1px;
-            box-shadow: 0 0 15px rgba(0,0,0,0.3);
-            border-left: 3px solid #ffaa44;
+            color: #8da3d1;
         }
-        #controls-hint {
-            position: absolute;
+
+        .stat-value {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #f0f3fa;
+        }
+
+        /* КНОПКА КЛИКА */
+        .click-button {
+            background: radial-gradient(circle at 30% 20%, #f5b042, #e67e22);
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            margin: 2rem auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 20px 30px -8px rgba(0,0,0,0.5), inset 0 2px 4px rgba(255,255,255,0.5);
+            transition: transform 0.08s linear, box-shadow 0.1s;
+            border: none;
+            background-size: 120%;
+        }
+
+        .click-button:active {
+            transform: scale(0.96);
+            box-shadow: 0 8px 15px -5px black;
+        }
+
+        .click-button i {
+            font-size: 5rem;
+            color: white;
+            filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.4));
+        }
+
+        .click-power-badge {
+            background: #2c3e66;
+            border-radius: 40px;
+            padding: 0.3rem 1rem;
+            font-weight: bold;
+            margin-top: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        /* ПРАВАЯ ПАНЕЛЬ — УЛУЧШЕНИЯ + ДОСТИЖЕНИЯ (вкладки) */
+        .upgrades-panel {
+            background: rgba(10, 18, 32, 0.7);
+            border-radius: 2rem;
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(66, 153, 225, 0.3);
+            padding: 1.2rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0.8rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid #2a3a60;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 0.7rem 1.2rem;
+            font-weight: 600;
+            color: #9bb5e6;
+            cursor: pointer;
+            font-size: 1rem;
+            border-radius: 2rem 2rem 0 0;
+            transition: 0.1s;
+        }
+
+        .tab-btn.active {
+            color: #ffd966;
+            background: #111e32;
+            box-shadow: 0 -2px 0 #ffd966;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fade 0.2s ease;
+            max-height: 60vh;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Список улучшений */
+        .upgrade-item {
+            background: #0e1625;
+            border-radius: 1.2rem;
+            padding: 0.8rem 1rem;
+            margin-bottom: 0.8rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: 0.1s;
+            border-left: 4px solid #f39c12;
+        }
+
+        .upgrade-info h4 {
+            font-size: 1rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .upgrade-info p {
+            font-size: 0.7rem;
+            color: #8db2e0;
+        }
+
+        .upgrade-stats {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #f0c674;
+        }
+
+        .upgrade-buy {
+            background: #2c3e50;
+            border: none;
+            padding: 0.4rem 1rem;
+            border-radius: 2rem;
+            font-weight: bold;
+            color: #ffe0a3;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+
+        .upgrade-buy:active { transform: scale(0.96);}
+        .upgrade-buy.disabled { opacity: 0.5; pointer-events: none;}
+
+        .achievement-item {
+            background: #0e1625aa;
+            border-radius: 1rem;
+            padding: 0.8rem;
+            margin-bottom: 0.6rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            border: 1px solid #2e4a76;
+        }
+
+        .achievement-icon {
+            font-size: 1.8rem;
+        }
+        .achievement-text {
+            flex:1;
+        }
+
+        .toast-notify {
+            position: fixed;
             bottom: 20px;
-            left: 20px;
-            color: rgba(255,255,255,0.6);
-            background: rgba(0,0,0,0.4);
-            padding: 5px 12px;
-            border-radius: 6px;
-            font-size: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e2a3e;
+            backdrop-filter: blur(12px);
+            color: #ffde9c;
+            padding: 0.8rem 1.8rem;
+            border-radius: 3rem;
+            font-weight: bold;
+            z-index: 1000;
             pointer-events: none;
-            font-family: monospace;
+            border-left: 5px solid #f39c12;
+            box-shadow: 0 4px 15px black;
+            transition: 0.2s;
         }
-        @media (max-width: 600px) {
-            #info { font-size: 10px; top: 10px; left: 10px; }
-            #controls-hint { font-size: 8px; }
+
+        @keyframes fade {
+            from { opacity: 0; transform: translateY(6px);}
+            to { opacity: 1; transform: translateY(0);}
         }
+
+        /* floating numbers */
+        .floating-number {
+            position: fixed;
+            pointer-events: none;
+            font-weight: 800;
+            font-size: 1.6rem;
+            color: #ffda88;
+            text-shadow: 0 0 5px #ff9800;
+            z-index: 2000;
+            animation: floatUp 0.7s ease-out forwards;
+        }
+
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0px) scale(0.8);}
+            100% { opacity: 0; transform: translateY(-80px) scale(1.2);}
+        }
+
+        .reset-btn {
+            background: #371f2b;
+            border: none;
+            color: #ffa597;
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            margin-top: 1rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.1s;
+        }
+
+        @media (max-width: 850px) {
+            .dashboard { grid-template-columns: 1fr; gap: 1rem; }
+            .click-button { width: 160px; height: 160px; }
+            .click-button i { font-size: 3rem; }
+            .coin-display { font-size: 1.2rem; }
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #111c2a; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #f39c12; border-radius: 10px; }
     </style>
 </head>
 <body>
-    <div id="info">
-        ✨ ГЛОГУССТАРС ✨ | Вращающийся глобус | Звёздное сияние
+<div class="game-container">
+    <div class="dashboard">
+        <!-- Левая секция: кликер -->
+        <div class="clicker-panel">
+            <div class="stats">
+                <div class="coin-display">
+                    <i class="fas fa-coins"></i>
+                    <span id="coinAmount">0</span>
+                </div>
+                <div class="stat-grid">
+                    <div class="stat-card"><div class="stat-label"><i class="fas fa-hand-peace"></i> Сила клика</div><div class="stat-value" id="clickPowerDisplay">1</div></div>
+                    <div class="stat-card"><div class="stat-label"><i class="fas fa-charging-station"></i> В сек.</div><div class="stat-value" id="cpsDisplay">0</div></div>
+                    <div class="stat-card"><div class="stat-label"><i class="fas fa-chart-line"></i> Кликов</div><div class="stat-value" id="totalClicksDisplay">0</div></div>
+                </div>
+            </div>
+            <div class="click-button" id="clickableButton">
+                <i class="fas fa-hand-fist"></i>
+                <div class="click-power-badge">КЛИКНИ!</div>
+            </div>
+            <button class="reset-btn" id="resetGameBtn"><i class="fas fa-trash-alt"></i> Перезапустить игру</button>
+        </div>
+
+        <!-- Правая секция: вкладки улучшения / достижения -->
+        <div class="upgrades-panel">
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="upgradesTab"><i class="fas fa-rocket"></i> Улучшения</button>
+                <button class="tab-btn" data-tab="achievementsTab"><i class="fas fa-trophy"></i> Достижения</button>
+            </div>
+            <div class="tab-content active" id="upgradesTab">
+                <div id="upgradesList"></div>
+            </div>
+            <div class="tab-content" id="achievementsTab">
+                <div id="achievementsList"></div>
+            </div>
+        </div>
     </div>
-    <div id="controls-hint">
-        🖱️ Мышь: вращать камеру | 📜 Скролл: приблизить
-    </div>
+</div>
 
-    <!-- Подключаем Three.js и вспомогательные расширения через CDN -->
-    <script type="importmap">
-        {
-            "imports": {
-                "three": "https://unpkg.com/three@0.128.0/build/three.module.js",
-                "three/addons/": "https://unpkg.com/three@0.128.0/examples/jsm/"
-            }
+<script>
+    // ---------- КОНФИГУРАЦИЯ УЛУЧШЕНИЙ ----------
+    const UPGRADES_DATA = [
+        { id: "strongClick", name: "💪 Крепкий клик", type: "click", bonusClick: 1, bonusCps: 0, baseCost: 10, costMultiplier: 1.25, desc: "+1 к силе клика" },
+        { id: "autoClicker", name: "⚙️ Автокликер", type: "auto", bonusClick: 0, bonusCps: 0.5, baseCost: 20, costMultiplier: 1.25, desc: "+0.5 монет/сек" },
+        { id: "doubleStrike", name: "⚡ Двойной удар", type: "click", bonusClick: 2, bonusCps: 0, baseCost: 50, costMultiplier: 1.3, desc: "+2 к силе клика" },
+        { id: "robotFarm", name: "🤖 Робоферма", type: "auto", bonusClick: 0, bonusCps: 2, baseCost: 80, costMultiplier: 1.3, desc: "+2 монет/сек" },
+        { id: "megaClick", name: "💥 Мега клик", type: "click", bonusClick: 5, bonusCps: 0, baseCost: 200, costMultiplier: 1.35, desc: "+5 к силе клика" },
+        { id: "quantumGen", name: "🌀 Квантовый ген.", type: "auto", bonusClick: 0, bonusCps: 10, baseCost: 500, costMultiplier: 1.35, desc: "+10 монет/сек" }
+    ];
+
+    // ДОСТИЖЕНИЯ
+    const ACHIEVEMENTS = [
+        { id: "ach1", name: "Новичок", condition: "clicks", target: 100, reward: 100, desc: "100 кликов", claimed: false, rewardGiven: false },
+        { id: "ach2", name: "Кликер", condition: "clicks", target: 1000, reward: 500, desc: "1000 кликов", claimed: false, rewardGiven: false },
+        { id: "ach3", name: "Профи", condition: "clicks", target: 5000, reward: 2000, desc: "5000 кликов", claimed: false, rewardGiven: false },
+        { id: "ach4", name: "Легенда", condition: "clicks", target: 25000, reward: 10000, desc: "25000 кликов", claimed: false, rewardGiven: false },
+        { id: "ach5", name: "Первая тысяча", condition: "coinsEarned", target: 1000, reward: 200, desc: "Заработано 1000 монет", claimed: false, rewardGiven: false },
+        { id: "ach6", name: "Магнат", condition: "coinsEarned", target: 10000, reward: 1500, desc: "Заработано 10k монет", claimed: false, rewardGiven: false },
+        { id: "ach7", name: "Миллионер", condition: "coinsEarned", target: 100000, reward: 25000, desc: "Заработано 100k монет", claimed: false, rewardGiven: false },
+        { id: "ach8", name: "Инвестор", condition: "upgradesBought", target: 15, reward: 500, desc: "Куплено 15 улучшений", claimed: false, rewardGiven: false }
+    ];
+
+    // Глобальные переменные игры
+    let coins = 0;                  // текущие монеты
+    let totalClicks = 0;           // всего кликов
+    let totalCoinsEarned = 0;      // заработано монет за всё время
+    let totalUpgradesBought = 0;    // общее количество купленных улучшений (сумма уровней)
+    
+    // Уровни улучшений
+    let upgradesLevels = {};
+    // бонусы
+    let currentClickPower = 1;
+    let currentCPS = 0;
+    
+    // Состояние достижений (копируем)
+    let achievementsState = JSON.parse(JSON.stringify(ACHIEVEMENTS));
+    
+    // DOM элементы
+    const coinSpan = document.getElementById("coinAmount");
+    const clickPowerSpan = document.getElementById("clickPowerDisplay");
+    const cpsSpan = document.getElementById("cpsDisplay");
+    const totalClicksSpan = document.getElementById("totalClicksDisplay");
+    const upgradesContainer = document.getElementById("upgradesList");
+    const achievementsContainer = document.getElementById("achievementsList");
+    const clickBtn = document.getElementById("clickableButton");
+    const resetBtn = document.getElementById("resetGameBtn");
+    
+    // UI helpers
+    function showToast(message, isError = false) {
+        let toast = document.createElement("div");
+        toast.className = "toast-notify";
+        toast.innerHTML = `<i class="fas ${isError ? 'fa-exclamation-triangle' : 'fa-gem'}"></i> ${message}`;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 2000);
+    }
+    
+    // Создание летающей цифры
+    function createFloatingNumber(value, x, y) {
+        const el = document.createElement("div");
+        el.className = "floating-number";
+        el.innerText = `+${Math.floor(value)}`;
+        el.style.left = `${x}px`;
+        el.style.top = `${y}px`;
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 700);
+    }
+    
+    // Пересчёт силы клика и CPS
+    function recalcStats() {
+        let clickBonus = 0;
+        let cpsBonus = 0;
+        for (let up of UPGRADES_DATA) {
+            let level = upgradesLevels[up.id] || 0;
+            if (up.type === "click") clickBonus += up.bonusClick * level;
+            if (up.type === "auto") cpsBonus += up.bonusCps * level;
         }
-    </script>
-
-    <script type="module">
-        import * as THREE from 'three';
-        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-        import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-        import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-        import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
-        
-        // --- Инициализация сцены, камеры, рендерера ---
-        const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x030318); // глубокий космический синий
-        scene.fog = new THREE.FogExp2(0x030318, 0.0008); // легкая дымка для глубины
-
-        // Камера: перспектива, угол обзора, соотношение, ближняя/дальняя плоскости
-        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(0, 0, 3.5);
-        camera.lookAt(0, 0, 0);
-
-        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(window.devicePixelRatio);
-        renderer.toneMapping = THREE.ReinhardToneMapping;
-        renderer.toneMappingExposure = 1.2;
-        document.body.appendChild(renderer.domElement);
-
-        // --- Эффекты постобработки (свечение для звёзд и глобуса) ---
-        const renderScene = new RenderPass(scene, camera);
-        const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.2, 0.3, 0.85);
-        bloomPass.threshold = 0.1;  // яркость порога
-        bloomPass.strength = 0.6;
-        bloomPass.radius = 0.5;
-        
-        const effectComposer = new EffectComposer(renderer);
-        effectComposer.addPass(renderScene);
-        effectComposer.addPass(bloomPass);
-        
-        // --- Орбит контрол для интерактива (можно вращать и приближать) ---
-        const controls = new OrbitControls(camera, renderer.domElement);
-        controls.enableDamping = true;          // плавное затухание
-        controls.dampingFactor = 0.05;
-        controls.rotateSpeed = 1.0;
-        controls.zoomSpeed = 1.2;
-        controls.enableZoom = true;
-        controls.zoomSpeed = 1.0;
-        controls.enablePan = false;
-        controls.autoRotate = false;            // отключаем автовращение контролов, вращать будем сам глобус
-        controls.target.set(0, 0, 0);
-        
-        // --- СОЗДАНИЕ ГЛОБУСА (Земля с текстурой высокого качества) ---
-        // Используем качественную текстуру Земли от Three.js примеров (диффузная + спекуляр + нормаль для рельефа)
-        // Загружаем текстуры с CDN, чтобы глобус выглядел реалистично
-        
-        const textureLoader = new THREE.TextureLoader();
-        
-        // Карта цветов Земли (дневная)
-        const earthMap = textureLoader.load('https://threejs.org/examples/textures/planets/earth_atmos_2048.jpg');
-        // Карта облаков (полупрозрачная для эффекта)
-        const earthCloudMap = textureLoader.load('https://threejs.org/examples/textures/planets/earth_clouds_1024.png');
-        // Карта рельефа (нормалей)
-        const earthNormalMap = textureLoader.load('https://threejs.org/examples/textures/planets/earth_normal_2048.jpg');
-        // Спекулярная карта (блики воды)
-        const earthSpecularMap = textureLoader.load('https://threejs.org/examples/textures/planets/earth_specular_2048.jpg');
-        
-        // Основная сфера глобуса
-        const earthGeometry = new THREE.SphereGeometry(1.0, 128, 128);
-        const earthMaterial = new THREE.MeshPhongMaterial({
-            map: earthMap,
-            normalMap: earthNormalMap,
-            specularMap: earthSpecularMap,
-            specular: new THREE.Color('grey'),
-            shininess: 5,
-            emissive: new THREE.Color(0x000022), // легкое свечение с темной стороны
-            emissiveIntensity: 0.15
-        });
-        
-        const earth = new THREE.Mesh(earthGeometry, earthMaterial);
-        scene.add(earth);
-        
-        // Слой облаков (прозрачная сфера чуть большего радиуса)
-        const cloudGeometry = new THREE.SphereGeometry(1.01, 128, 128);
-        const cloudMaterial = new THREE.MeshPhongMaterial({
-            map: earthCloudMap,
-            transparent: true,
-            opacity: 0.15,
-            blending: THREE.AdditiveBlending
-        });
-        const clouds = new THREE.Mesh(cloudGeometry, cloudMaterial);
-        scene.add(clouds);
-        
-        // Добавим атмосферное свечение (внешняя оболочка с эффектом)
-        const atmosphereGeometry = new THREE.SphereGeometry(1.04, 64, 64);
-        const atmosphereMaterial = new THREE.MeshPhongMaterial({
-            color: 0x88aaff,
-            transparent: true,
-            opacity: 0.12,
-            side: THREE.BackSide
-        });
-        const atmosphere = new THREE.Mesh(atmosphereGeometry, atmosphereMaterial);
-        scene.add(atmosphere);
-        
-        // --- ЗВЁЗДНОЕ ПОЛЕ (динамические мерцающие частицы) ---
-        // Создаём большое количество частиц, разбросанных в пространстве
-        
-        const starCount = 3000;
-        const starGeometry = new THREE.BufferGeometry();
-        const starPositions = new Float32Array(starCount * 3);
-        const starColors = new Float32Array(starCount * 3);
-        
-        // Разброс звёзд в сфере радиусом 150-250, но с разной удалённостью для глубины
-        for (let i = 0; i < starCount; i++) {
-            // Используем сферические координаты с случайным радиусом
-            const radius = 80 + Math.random() * 120; // от 80 до 200
-            const theta = Math.random() * Math.PI * 2;
-            const phi = Math.acos(2 * Math.random() - 1);
-            
-            const x = radius * Math.sin(phi) * Math.cos(theta);
-            const y = radius * Math.sin(phi) * Math.sin(theta);
-            const z = radius * Math.cos(phi);
-            
-            starPositions[i*3] = x;
-            starPositions[i*3+1] = y;
-            starPositions[i*3+2] = z;
-            
-            // Цвет звёзд: от холодного белого до слегка голубоватого/желтоватого
-            const colorVal = 0.6 + Math.random() * 0.5;
-            const r = colorVal * (Math.random() > 0.7 ? 0.9 : 1.0);
-            const g = colorVal * (Math.random() > 0.6 ? 0.95 : 1.0);
-            const b = colorVal * (0.8 + Math.random() * 0.4);
-            
-            starColors[i*3] = r;
-            starColors[i*3+1] = g;
-            starColors[i*3+2] = b;
-        }
-        
-        starGeometry.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
-        starGeometry.setAttribute('color', new THREE.BufferAttribute(starColors, 3));
-        
-        // Материал для звёзд (точечные спрайты с круглой формой)
-        // Создаём canvas текстуру для круглого градиентного свечения
-        const createStarTexture = () => {
-            const canvas = document.createElement('canvas');
-            canvas.width = 32;
-            canvas.height = 32;
-            const ctx = canvas.getContext('2d');
-            ctx.beginPath();
-            ctx.arc(16, 16, 14, 0, 2 * Math.PI);
-            ctx.fillStyle = 'white';
-            ctx.fill();
-            ctx.globalCompositeOperation = 'source-over';
-            ctx.shadowBlur = 0;
-            const gradient = ctx.createRadialGradient(16, 16, 0, 16, 16, 14);
-            gradient.addColorStop(0, 'rgba(255,255,255,1)');
-            gradient.addColorStop(0.5, 'rgba(255,255,200,0.8)');
-            gradient.addColorStop(0.8, 'rgba(255,200,100,0.3)');
-            gradient.addColorStop(1, 'rgba(255,255,255,0)');
-            ctx.fillStyle = gradient;
-            ctx.fillRect(0, 0, 32, 32);
-            return new THREE.CanvasTexture(canvas);
+        currentClickPower = 1 + clickBonus;
+        currentCPS = cpsBonus;
+    }
+    
+    // Сохранение в localStorage
+    function saveGame() {
+        const saveData = {
+            coins: coins,
+            totalClicks: totalClicks,
+            totalCoinsEarned: totalCoinsEarned,
+            totalUpgradesBought: totalUpgradesBought,
+            upgradesLevels: upgradesLevels,
+            achievements: achievementsState.map(a => ({ id: a.id, claimed: a.claimed, rewardGiven: a.rewardGiven })),
+            timestamp: Date.now()
         };
-        
-        const starMaterial = new THREE.PointsMaterial({
-            size: 0.35,
-            map: createStarTexture(),
-            vertexColors: true,
-            transparent: true,
-            opacity: 0.9,
-            blending: THREE.AdditiveBlending
-        });
-        
-        const starField = new THREE.Points(starGeometry, starMaterial);
-        scene.add(starField);
-        
-        // Добавим дополнительный слой очень дальних, тусклых звёзд (мелкие точки)
-        const distantStarCount = 1500;
-        const distantGeo = new THREE.BufferGeometry();
-        const distantPositions = new Float32Array(distantStarCount * 3);
-        for (let i = 0; i < distantStarCount; i++) {
-            // Распределение равномерно по сфере большего радиуса
-            const rad = 180 + Math.random() * 100;
-            const theta2 = Math.random() * Math.PI * 2;
-            const phi2 = Math.acos(2 * Math.random() - 1);
-            distantPositions[i*3] = rad * Math.sin(phi2) * Math.cos(theta2);
-            distantPositions[i*3+1] = rad * Math.sin(phi2) * Math.sin(theta2);
-            distantPositions[i*3+2] = rad * Math.cos(phi2);
+        localStorage.setItem("megaClickerSave", JSON.stringify(saveData));
+    }
+    
+    // Загрузка и оффлайн прогресс
+    function loadGame() {
+        const raw = localStorage.getItem("megaClickerSave");
+        if (raw) {
+            try {
+                const data = JSON.parse(raw);
+                coins = data.coins || 0;
+                totalClicks = data.totalClicks || 0;
+                totalCoinsEarned = data.totalCoinsEarned || 0;
+                totalUpgradesBought = data.totalUpgradesBought || 0;
+                upgradesLevels = data.upgradesLevels || {};
+                // восстановить достижения
+                if (data.achievements) {
+                    for (let savedAch of data.achievements) {
+                        let found = achievementsState.find(a => a.id === savedAch.id);
+                        if (found) {
+                            found.claimed = savedAch.claimed;
+                            found.rewardGiven = savedAch.rewardGiven;
+                        }
+                    }
+                }
+                // оффлайн доход
+                const lastTimestamp = data.timestamp;
+                if (lastTimestamp && currentCPS > 0) {
+                    const now = Date.now();
+                    const secondsDiff = Math.floor((now - lastTimestamp) / 1000);
+                    if (secondsDiff > 0 && secondsDiff < 86400) {  // макс 1 день разумно
+                        const offlineCoins = secondsDiff * currentCPS;
+                        if (offlineCoins > 0) {
+                            coins += offlineCoins;
+                            totalCoinsEarned += offlineCoins;
+                            showToast(`✨ За время отсутствия вы получили ${Math.floor(offlineCoins)} монет!`, false);
+                        }
+                    }
+                }
+            } catch(e) { console.warn(e);}
         }
-        distantGeo.setAttribute('position', new THREE.BufferAttribute(distantPositions, 3));
-        const distantStarMat = new THREE.PointsMaterial({
-            color: 0xaaccff,
-            size: 0.12,
-            transparent: true,
-            opacity: 0.5,
-            blending: THREE.AdditiveBlending
-        });
-        const distantStars = new THREE.Points(distantGeo, distantStarMat);
-        scene.add(distantStars);
-        
-        // --- МЕРЦАНИЕ ЗВЁЗД (анимация с использованием времени) ---
-        // Сохраним оригинальные цвета и размеры для анимации
-        // У каждого starPoints можно анимировать opacity или размер, но проще - глобальное мерцание через смену прозрачности?
-        // Сделаем пульсацию для starField и distantStars с разной скоростью
-        // Также добавим эффект "летящих" метеоров? Нет, оставим элегантное мерцание.
-        
-        // Создадим массив для индивидуального мерцания ярких звёзд (выборочно)
-        // Для упрощения сделаем общую анимацию opacity и небольшую ротацию звездного поля для динамики
-        
-        // Дополнительно: добавим несколько крупных "сияющих" звезд (спрайты)
-        const bigStarsCount = 80;
-        const bigStarsGeometry = new THREE.BufferGeometry();
-        const bigStarsPos = [];
-        for (let i = 0; i < bigStarsCount; i++) {
-            const rad = 70 + Math.random() * 130;
-            const theta = Math.random() * Math.PI * 2;
-            const phi = Math.acos(2 * Math.random() - 1);
-            bigStarsPos.push(rad * Math.sin(phi) * Math.cos(theta));
-            bigStarsPos.push(rad * Math.sin(phi) * Math.sin(theta));
-            bigStarsPos.push(rad * Math.cos(phi));
+        // Инициализация отсутствующих уровней
+        for (let up of UPGRADES_DATA) {
+            if (upgradesLevels[up.id] === undefined) upgradesLevels[up.id] = 0;
         }
-        bigStarsGeometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(bigStarsPos), 3));
-        const bigStarMat = new THREE.PointsMaterial({
-            color: 0xffdd99,
-            size: 0.55,
-            transparent: true,
-            blending: THREE.AdditiveBlending
-        });
-        const bigStars = new THREE.Points(bigStarsGeometry, bigStarMat);
-        scene.add(bigStars);
-        
-        // --- ЭФФЕКТ МГНОВЕННЫХ "ПАДАЮЩИХ ЗВЕЗД" (опционально) - добавим пару линий? нет, ограничимся мерцанием.
-        
-        // --- ОСВЕЩЕНИЕ (источники света для реалистичного глобуса) ---
-        // Основной направленный свет (имитация солнца)
-        const sunLight = new THREE.DirectionalLight(0xffffff, 1.2);
-        sunLight.position.set(5, 3, 5);
-        sunLight.castShadow = false; // для производительности
-        scene.add(sunLight);
-        
-        // Дополнительный мягкий свет сзади для подсветки теней
-        const backLight = new THREE.DirectionalLight(0x88aaff, 0.4);
-        backLight.position.set(-3, -1, -4);
-        scene.add(backLight);
-        
-        // Заполняющий свет со всех сторон, чтобы тени не были слишком черными
-        const ambientLight = new THREE.AmbientLight(0x111122, 0.5);
-        scene.add(ambientLight);
-        
-        // Подсветка глобуса с нижней части (красивый эффект)
-        const fillLight = new THREE.PointLight(0x4466cc, 0.3);
-        fillLight.position.set(0, -2, 0);
-        scene.add(fillLight);
-        
-        // Легкая подсветка звездного поля - не нужна, сами светятся
-        
-        // --- ВРАЩЕНИЕ ГЛОБУСА И ОБЛАКОВ ---
-        // Глобус вращается с постоянной скоростью, облака чуть быстрее для эффекта движения
-        
-        let time = 0;
-        
-        // Анимация мерцания звезд: будем менять opacity материалов и размеры частиц
-        // Для пульсации создадим несколько фаз
-        let starPulseSpeed = 0.8;
-        let bigStarPulseSpeed = 1.2;
-        
-        // Сохраним базовые размеры
-        const baseStarSize = starMaterial.size;
-        const baseBigStarSize = bigStarMat.size;
-        const baseDistantOpacity = distantStarMat.opacity;
-        
-        // Дополнительно: добавим случайное смещение для некоторых звезд через шейдер? Упростим анимацию через синус
-        
-        // Также можно добавить вращение всей звездной сферы очень медленное для эффекта движения
-        let starRotationY = 0;
-        
-        // --- АНИМАЦИОННЫЙ ЦИКЛ ---
-        function animate() {
-            requestAnimationFrame(animate);
-            time += 0.012; // плавное увеличение времени
-            
-            // Вращение глобуса и облаков
-            earth.rotation.y += 0.0025;
-            clouds.rotation.y += 0.0032; // облака двигаются чуть быстрее
-            atmosphere.rotation.y += 0.0022;
-            
-            // Динамическое мерцание звезд: изменяем прозрачность и размер в зависимости от времени
-            // Используем синусоидальные волны с разными частотами для разных слоев
-            
-            // Яркие звезды - пульсация
-            const pulse1 = 0.7 + Math.sin(time * 1.8) * 0.2;
-            const pulse2 = 0.6 + Math.sin(time * 2.3) * 0.25;
-            
-            starMaterial.opacity = 0.7 + Math.sin(time * 1.2) * 0.2;
-            starMaterial.size = baseStarSize * (0.85 + Math.sin(time * 1.5) * 0.15);
-            
-            bigStarMat.opacity = 0.8 + Math.sin(time * 1.9) * 0.2;
-            bigStarMat.size = baseBigStarSize * (0.8 + Math.sin(time * 2.1) * 0.2);
-            
-            distantStarMat.opacity = baseDistantOpacity * (0.7 + Math.sin(time * 0.9) * 0.3);
-            
-            // Медленное вращение звездного поля для создания иллюзии движения космоса
-            starField.rotation.y += 0.0003;
-            starField.rotation.x += 0.00015;
-            distantStars.rotation.y -= 0.0002;
-            distantStars.rotation.x += 0.0001;
-            bigStars.rotation.y += 0.00025;
-            bigStars.rotation.z += 0.0001;
-            
-            // Небольшое изменение цвета атмосферы или свечения (для красоты)
-            const hueShift = (Math.sin(time * 0.3) * 0.02);
-            atmosphereMaterial.color.setHSL(0.55 + hueShift, 0.7, 0.6);
-            
-            // Обновление эффекта Bloom (легкая динамика силы свечения)
-            bloomPass.strength = 0.55 + Math.sin(time * 0.7) * 0.08;
-            
-            // Обновление контроля (если используется авто вращение камеры - нет, но мы вращаем объект)
-            controls.update(); // обновляем, чтобы мышь работала плавно
-            
-            // --- ДОПОЛНИТЕЛЬНЫЙ ЭФФЕКТ: летающие частицы "комет" (очень редко, добавим простой sparkle) ---
-            // Вместо сложных частиц, просто добавим мерцающие блики на глобусе - не обязательно
-            
-            // Рендеринг через эффект композер
-            effectComposer.render();
+        recalcStats();
+        updateUI();
+        checkAchievements(); // после восстановления проверим достижения
+    }
+    
+    // Покупка улучшения
+    function buyUpgrade(upgradeId) {
+        const upgrade = UPGRADES_DATA.find(u => u.id === upgradeId);
+        if (!upgrade) return;
+        const level = upgradesLevels[upgrade.id] || 0;
+        let cost = Math.floor(upgrade.baseCost * Math.pow(upgrade.costMultiplier, level));
+        if (coins < cost) {
+            showToast(`Не хватает монет! Нужно ${Math.floor(cost)}`, true);
+            return;
         }
+        // Покупка
+        coins -= cost;
+        upgradesLevels[upgrade.id] = level + 1;
+        totalUpgradesBought++;
+        totalCoinsEarned += 0; // покупка не добавляет к earned, но важно
+        recalcStats();
+        updateUI();
+        saveGame();
+        showToast(`💰 Вы купили ${upgrade.name} (ур.${level+1})`, false);
+        checkAchievements();  // проверить достижения после покупки (количество купленных)
+    }
+    
+    // Обновление интерфейса
+    function updateUI() {
+        coinSpan.innerText = Math.floor(coins);
+        clickPowerSpan.innerText = currentClickPower;
+        cpsSpan.innerText = currentCPS.toFixed(1);
+        totalClicksSpan.innerText = totalClicks;
         
-        // Запускаем анимацию
-        animate();
-        
-        // --- АДАПТАЦИЯ ПОД ИЗМЕНЕНИЕ РАЗМЕРА ОКНА ---
-        window.addEventListener('resize', onWindowResize, false);
-        function onWindowResize() {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            effectComposer.setSize(window.innerWidth, window.innerHeight);
-        }
-        
-        // Небольшая задержка для загрузки текстур (показываем сообщение, но оно и так быстро)
-        console.log('ГлогусСтарс запущен! Наслаждайтесь космическим видом 🌍✨');
-        
-        // Добавим небольшую звездную туманность в фоне (опционально, просто для атмосферы)
-        // Создадим несколько случайных дымчатых облаков на заднем плане с помощью дополнительной сферы с текстурой?
-        // Для производительности не будем перегружать.
-        
-        // Но добавим одну большую, очень рассеянную сферу с низкой непрозрачностью (имитация галактики)
-        const galaxyGeometry = new THREE.SphereGeometry(45, 32, 32);
-        const galaxyMaterial = new THREE.MeshBasicMaterial({
-            color: 0x112244,
-            transparent: true,
-            opacity: 0.08,
-            side: THREE.BackSide
-        });
-        const galaxyBackground = new THREE.Mesh(galaxyGeometry, galaxyMaterial);
-        scene.add(galaxyBackground);
-        
-        // Также добавим очень маленькие мерцающие точки на поверхности глобуса? нет, достаточно
-    </script>
-</body>
-</html>
+        // Отрисовка улучшений
+        upgradesContainer.innerHTML = "";
+        for (let up of UPGRADES_DATA) {
+            const level = upgradesLevels[up.id] || 0;
+            let cost = Math.floor(up.baseCost * Math.pow(up.costMultiplier, level));
+            const hasMoney = coins >= cost;
+            const div = document.createElement("div");
+            div.className = "upgrade-item";
+     
